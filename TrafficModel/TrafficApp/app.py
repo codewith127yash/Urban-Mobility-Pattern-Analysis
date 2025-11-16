@@ -10,19 +10,19 @@ app = Flask(__name__)
 model = None
 label_enc = None
 
-# Load the model and label encoder
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def load_model_and_encoder():
     global model, label_enc
-    
-    # Load the trained model from the specific path
-    model_path = r"TrafficApp/traffic_model.pkl"
+
+    model_path = os.path.join(BASE_DIR, "traffic_model.pkl")
     with open(model_path, 'rb') as file:
         model = pickle.load(file)
-    
-    # Load the label encoder from the specific path
-    encoder_path = r"TrafficApp/label_encoder.pkl"
+
+    encoder_path = os.path.join(BASE_DIR, "label_encoder.pkl")
     with open(encoder_path, 'rb') as file:
         label_enc = pickle.load(file)
+
 
 # Load model and encoder when the app starts
 load_model_and_encoder()
@@ -163,4 +163,5 @@ def data_visualization():
     return render_template('data_visualization.html')
 
 if __name__ == '__main__':
+
     app.run(debug=False)
