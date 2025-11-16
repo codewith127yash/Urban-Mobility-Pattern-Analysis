@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Prediction App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 2rem;
+            background-color: #f8f9fa;
+        }
+        .prediction-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .heavy {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .high {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+        }
+        .normal {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+        }
+        .low {
+            background-color: #cfe2ff;
+            border: 1px solid #b6d4fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="text-center">Traffic Prediction App</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="predictionForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="hour" class="form-label">Hour (0-23)</label>
+                                    <input type="number" class="form-control" id="hour" name="hour" min="0" max="23" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="day" class="form-label">Day of Week</label>
+                                    <select class="form-select" id="day" name="day" required>
+                                        <option value="0">Monday</option>
+                                        <option value="1">Tuesday</option>
+                                        <option value="2">Wednesday</option>
+                                        <option value="3">Thursday</option>
+                                        <option value="4">Friday</option>
+                                        <option value="5">Saturday</option>
+                                        <option value="6">Sunday</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="car_count" class="form-label">Car Count</label>
+                                    <input type="number" class="form-control" id="car_count" name="car_count" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bike_count" class="form-label">Bike Count</label>
+                                    <input type="number" class="form-control" id="bike_count" name="bike_count" min="0" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="bus_count" class="form-label">Bus Count</label>
+                                    <input type="number" class="form-control" id="bus_count" name="bus_count" min="0" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="truck_count" class="form-label">Truck Count</label>
+                                    <input type="number" class="form-control" id="truck_count" name="truck_count" min="0" required>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Predict Traffic</button>
+                                <a href="/data" class="btn btn-secondary ms-2">View Data Visualization</a>
+                            </div>
+                        </form>
+                        
+                        <div id="predictionResult" class="prediction-result mt-4">
+                            <h4 class="text-center mb-3">Traffic Prediction Result</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5>Input Summary:</h5>
+                                    <ul id="inputSummary" class="list-group">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                        <div class="text-center">
+                                            <h5>Predicted Traffic Situation:</h5>
+                                            <h3 id="predictionText" class="mt-2"></h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#predictionForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                var formData = {
+                    hour: $('#hour').val(),
+                    day: $('#day').val(),
+                    car_count: $('#car_count').val(),
+                    bike_count: $('#bike_count').val(),
+                    bus_count: $('#bus_count').val(),
+                    truck_count: $('#truck_count').val()
+                };
+                
+                // Send AJAX request
+                $.ajax({
+                    url: '/predict',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        if (response.success) {
+                            // Update prediction result
+                            $('#predictionText').text(response.prediction.toUpperCase());
+                            
+                            // Clear and populate input summary
+                            $('#inputSummary').empty();
+                            $('#inputSummary').append('<li class="list-group-item">Hour: ' + response.input_summary.hour + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Day: ' + getDayName(response.input_summary.day) + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Car Count: ' + response.input_summary.car_count + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Bike Count: ' + response.input_summary.bike_count + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Bus Count: ' + response.input_summary.bus_count + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Truck Count: ' + response.input_summary.truck_count + '</li>');
+                            $('#inputSummary').append('<li class="list-group-item">Total: ' + response.input_summary.total + '</li>');
+                            
+                            // Show prediction result with appropriate class
+                            $('#predictionResult').removeClass('heavy high normal low').addClass(response.prediction);
+                            $('#predictionResult').show();
+                        } else {
+                            alert('Error: ' + response.error);
+                        }
+                    },
+                    error: function() {
+                        alert('Server error. Please try again later.');
+                    }
+                });
+            });
+            
+            function getDayName(dayNumber) {
+                const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                return days[dayNumber];
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Data Visualization</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <style>
+        body {
+            padding-top: 2rem;
+            background-color: #f8f9fa;
+        }
+        .chart-container {
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="text-center">Traffic Data Visualization</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead text-center">
+                            Visualize traffic patterns and make better decisions with our data insights.
+                        </p>
+                        <div class="text-center">
+                            <a href="/" class="btn btn-primary">Back to Prediction</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sample Charts -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Traffic by Hour of Day</h4>
+                    <canvas id="hourlyTrafficChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Traffic by Day of Week</h4>
+                    <canvas id="weekdayTrafficChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Vehicle Type Distribution</h4>
+                    <canvas id="vehicleTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h4>Traffic Situation Distribution</h4>
+                    <canvas id="trafficSituationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for charts (in a real app, this would be loaded from the server)
+        const hourlyData = {
+            labels: Array.from({length: 24}, (_, i) => i + ':00'),
+            datasets: [{
+                label: 'Average Traffic Volume',
+                data: [45, 40, 35, 30, 32, 38, 62, 85, 95, 88, 82, 90, 95, 88, 85, 90, 98, 102, 90, 85, 75, 65, 55, 50],
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+        
+        const weekdayData = {
+            labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            datasets: [{
+                label: 'Average Traffic Volume',
+                data: [85, 88, 90, 87, 92, 75, 65],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+        
+        const vehicleTypeData = {
+            labels: ['Cars', 'Bikes', 'Buses', 'Trucks'],
+            datasets: [{
+                label: 'Vehicle Distribution',
+                data: [65, 15, 10, 10],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(75, 192, 192, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+        
+        const trafficSituationData = {
+            labels: ['Normal', 'Low', 'High', 'Heavy'],
+            datasets: [{
+                label: 'Traffic Situation Distribution',
+                data: [55, 20, 15, 10],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.5)',
+                    'rgba(54, 162, 235, 0.5)',
+                    'rgba(255, 206, 86, 0.5)',
+                    'rgba(255, 99, 132, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hourly Traffic Chart
+            new Chart(document.getElementById('hourlyTrafficChart'), {
+                type: 'line',
+                data: hourlyData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Traffic Volume'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hour of Day'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Weekday Traffic Chart
+            new Chart(document.getElementById('weekdayTrafficChart'), {
+                type: 'bar',
+                data: weekdayData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Traffic Volume'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Vehicle Type Chart
+            new Chart(document.getElementById('vehicleTypeChart'), {
+                type: 'pie',
+                data: vehicleTypeData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Vehicle Type Distribution (%)'
+                        }
+                    }
+                }
+            });
+            
+            // Traffic Situation Chart
+            new Chart(document.getElementById('trafficSituationChart'), {
+                type: 'doughnut',
+                data: trafficSituationData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Traffic Situation Distribution (%)'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
